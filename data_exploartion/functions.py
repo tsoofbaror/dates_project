@@ -34,52 +34,16 @@ def get_score(estimator, x, y_true):
 
 
     ## Accuracy
-
     y_pred = np.argmax(y_pred_proba, axis=1)
     accuracy = np.mean(y_true_indices == y_pred)
 
-    return {'log_likelihood': log_likelihood, 'accuracy': accuracy}
 
+    # BIC
+    n = len(y_true)  # Number of samples
+    k = x.shape[1]  # Number of features
+    BIC = -2 * log_likelihood + k * np.log(n)
 
-def get_next_feature_with_BIC(model, X, y, features, cv):
-    current_features = []
-    # Initialize best BIC
-    best_BIC = np.inf
-    best_score = 0
-    best_feature = None
+    return {'log_likelihood': round(log_likelihood,3), 'accuracy': round(accuracy,3), "BIC": round(BIC,3)}
 
-    if len(features) == 1:
-        return features[0]
-
-    # Loop through the remaining features
-    for feature in features:
-        # Check if feature is already included
-        if feature in current_features:
-            continue
-
-        # Add the feature to the current features
-        current_features.append(feature)
-
-        #get indicis of features
-        feature_indices = [i for i, f in enumerate(features) if f in current_features]
-
-        # Fit the model
-        scores = cross_validate(model, X[feature_indices], y, cv=cv, scoring=make_scorer(get_score), return_train_score=False)
-
-        # Calculate the BIC
-        n = len(y)  # Number of samples
-        p = len(current_features)  # Number of features
-        log_likelihood = np.mean(scores['test_log_likelihood'])
-        BIC = -2 * log_likelihood + p * np.log(n)
-
-        # Check if BIC is the best so far
-        if BIC < best_BIC:
-            best_BIC = BIC
-            best_feature = feature
-
-        # Remove the feature from the current features
-        current_features.remove(feature)
-
-    return best_feature
 
 

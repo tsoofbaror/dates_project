@@ -1,0 +1,4 @@
+data,accuracy,recall,precision,f1
+train,0.909,0.909,0.909,0.909
+test,0.905,0.905,0.905,0.905
+combined,0.908,0.908,0.908,0.908
